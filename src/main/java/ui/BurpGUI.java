@@ -1,36 +1,50 @@
 package ui;
 
+import burp.IBurpExtenderCallbacks;
+import burp.IHttpService;
+import burp.IMessageEditor;
+import burp.IMessageEditorController;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
-public class BurpGUI {
+public class BurpGUI implements IMessageEditorController {
     public JPanel root;
-    private JLabel text;
-    private JButton button;
+    private IMessageEditor reqMessageEditor;
 
-    public BurpGUI() {
-        System.out.println("BurpGUI Constructor Called");
+    private IBurpExtenderCallbacks callbacks;
 
+    public BurpGUI(IBurpExtenderCallbacks cb) {
+        callbacks = cb;
+        createUIComponents();//这一行一定要加，不然会报空指针错误
+    }
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
         root = new JPanel();
-        root.setLayout(new BorderLayout());
-        text = new JLabel();
-        text.setText("Hello First GUI");
-        root.add(text, BorderLayout.CENTER);
+        reqMessageEditor = this.callbacks.createMessageEditor(BurpGUI.this,false);
 
-        button = new JButton("Click Me");
-        root.add(button, BorderLayout.SOUTH);
+        if (reqMessageEditor != null) {
+            root.add(reqMessageEditor.getComponent());
+        } else {
+            callbacks.printOutput("reqMessageEditor is null!");
+        }
 
-//        添加按钮的点击事件监听
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                text.setText("amazing! gui plug!!!");
-            }
-        });
     }
 
+    @Override
+    public IHttpService getHttpService() {
+        return null;
+    }
+
+    @Override
+    public byte[] getRequest() {
+        return new byte[0];
+    }
+
+    @Override
+    public byte[] getResponse() {
+        return new byte[0];
+    }
 
 
 }
